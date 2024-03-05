@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+
+  db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: tasksdb
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    ports:
+      - 3307:3306
+    volumes:
+      - db_data:/var/lib/mysql
+
+  tasks:
+    image: tasks:real
+    ports:
+      - 8080:8080
+    depends_on:
+      - db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/tasksdb
+      SPRING_DATASOURCE_USERNAME: user
+      SPRING_DATASOURCE_PASSWORD: password
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+
+  taskfront:
+    image: fun-taskfront:latest
+    ports:
+      - 3000:80
+    depends_on:
+      - tasks
+    
+volumes:
+  db_data: {}
