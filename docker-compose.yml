@@ -10,15 +10,13 @@ services:
       MYSQL_DATABASE: tasksdb
       MYSQL_USER: user
       MYSQL_PASSWORD: password
-    ports:
-      - 3307:3306
     volumes:
       - db_data:/var/lib/mysql
+    networks:
+      - mynetwork
 
   tasks:
     image: tasks:real
-    ports:
-      - 8080:8080
     depends_on:
       - db
     environment:
@@ -26,13 +24,19 @@ services:
       SPRING_DATASOURCE_USERNAME: user
       SPRING_DATASOURCE_PASSWORD: password
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    networks:
+      - mynetwork
 
   taskfront:
     image: fun-taskfront:latest
-    ports:
-      - 3000:80
     depends_on:
       - tasks
-    
+    networks:
+      - mynetwork
+
+networks:
+  mynetwork:
+    driver: bridge
+
 volumes:
   db_data: {}
